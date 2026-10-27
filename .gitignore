@@ -1,0 +1,20 @@
+# WhatsApp Web session cache and auth tokens
+.wwebjs_auth
+.wwebjs_cache
+
+# Node dependencies
+node_modules/
+
+# Environment secrets
+.env
+.env.local
+
+# Live orders (protect customer details in git)
+data/orders.json
+
+# System & IDE logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+Thumbs.db

@@ -1,0 +1,32 @@
+{
+  "name": "asaba-chop-and-grill-whatsapp-bot",
+  "version": "1.0.0",
+  "description": "WhatsApp Ordering Bot for Asaba Chop & Grill - Built for Asaba Residents and deployable on Render.com",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "whatsapp-bot",
+    "asaba",
+    "restaurant",
+    "food-ordering",
+    "render",
+    "whatsapp-web.js",
+    "gemini-ai"
+  ],
+  "author": "Asaba Chop & Grill",
+  "license": "ISC",
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "qrcode": "^1.5.4",
+    "whatsapp-web.js": "^1.23.0"
+  }
+}

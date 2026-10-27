@@ -1,0 +1,143 @@
+[
+  {
+    "id": 1,
+    "name": "Chicken Suya (Full Chicken)",
+    "price": 5000,
+    "available": true,
+    "category": "BBQ",
+    "desc": "Full chicken, yaji, onions, pepper"
+  },
+  {
+    "id": 2,
+    "name": "Asun (Spicy Goat Meat)",
+    "price": 4000,
+    "available": true,
+    "category": "BBQ"
+  },
+  {
+    "id": 3,
+    "name": "BBQ Fish (Croaker) + Chips",
+    "price": 6500,
+    "available": true,
+    "category": "BBQ"
+  },
+  {
+    "id": 4,
+    "name": "Ram Suya - 10 Sticks",
+    "price": 3500,
+    "available": true,
+    "category": "BBQ"
+  },
+  {
+    "id": 5,
+    "name": "Turkey Wings BBQ (2pcs)",
+    "price": 4500,
+    "available": true,
+    "category": "BBQ"
+  },
+  {
+    "id": 6,
+    "name": "Chicken Pepper Soup",
+    "price": 3500,
+    "available": true,
+    "category": "Pepper Soup"
+  },
+  {
+    "id": 7,
+    "name": "Goat Meat Pepper Soup",
+    "price": 4000,
+    "available": true,
+    "category": "Pepper Soup"
+  },
+  {
+    "id": 8,
+    "name": "Catfish Pepper Soup + Agidi",
+    "price": 5000,
+    "available": true,
+    "category": "Pepper Soup"
+  },
+  {
+    "id": 9,
+    "name": "Assorted Pepper Soup",
+    "price": 4500,
+    "available": true,
+    "category": "Pepper Soup"
+  },
+  {
+    "id": 10,
+    "name": "Jollof Rice + Chicken",
+    "price": 2800,
+    "available": true,
+    "category": "Rice"
+  },
+  {
+    "id": 11,
+    "name": "White Rice + Stew + Beef",
+    "price": 2500,
+    "available": true,
+    "category": "Rice"
+  },
+  {
+    "id": 12,
+    "name": "Fried Rice + Chicken",
+    "price": 3000,
+    "available": true,
+    "category": "Rice"
+  },
+  {
+    "id": 13,
+    "name": "Rice and Beans + Plantain + Fish",
+    "price": 2200,
+    "available": true,
+    "category": "Rice"
+  },
+  {
+    "id": 14,
+    "name": "Abacha + Ugba + Fish",
+    "price": 1800,
+    "available": true,
+    "category": "Local"
+  },
+  {
+    "id": 15,
+    "name": "Okpa + Coke",
+    "price": 1200,
+    "available": true,
+    "category": "Local"
+  },
+  {
+    "id": 16,
+    "name": "Banga Soup + Starch",
+    "price": 3000,
+    "available": true,
+    "category": "Soup"
+  },
+  {
+    "id": 17,
+    "name": "Ofe Nsala + Pounded Yam",
+    "price": 3500,
+    "available": true,
+    "category": "Soup"
+  },
+  {
+    "id": 18,
+    "name": "Coke 50cl",
+    "price": 400,
+    "available": true,
+    "category": "Drink"
+  },
+  {
+    "id": 19,
+    "name": "Malt / Fanta / Sprite",
+    "price": 400,
+    "available": true,
+    "category": "Drink"
+  },
+  {
+    "id": 20,
+    "name": "Water 75cl",
+    "price": 300,
+    "available": true,
+    "category": "Drink"
+  }
+]

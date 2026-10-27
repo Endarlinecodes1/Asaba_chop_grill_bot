@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🍗 Asaba Chop & Grill - WhatsApp Ordering System - For Asaba Residents</title>
+  <meta name="description" content="Management Dashboard & WhatsApp Bot for Asaba Chop & Grill. Real-time food orders, live QR connection, menu availability toggle and customer delivery updates in Asaba, Delta State.">
+  
+  <!-- Google Fonts: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons for polished aesthetics -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- QRCode CDN library for canvas rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- App Container -->
+  <div class="app-layout">
+    
+    <!-- Top Header Navigation -->
+    <header class="app-header">
+      <div class="header-container">
+        <div class="brand-block">
+          <div class="brand-logo">
+            <span class="grill-flame">🔥</span>
+            <i class="fa-solid fa-utensils"></i>
+          </div>
+          <div>
+            <div class="brand-badge-tag">
+              <span class="location-dot"></span> Asaba, Delta State
+            </div>
+            <h1 class="brand-title">Asaba Chop & Grill</h1>
+            <p class="brand-subtitle">WhatsApp Ordering System • For Asaba Residents</p>
+          </div>
+        </div>
+
+        <!-- Bot Controls & Live Status Indicator -->
+        <div class="header-actions">
+          <div id="botConnectionBadge" class="status-pill status-disconnected">
+            <span class="pulse-indicator"></span>
+            <span id="botStatusText">Checking Bot...</span>
+          </div>
+
+          <div id="botPauseBadge" class="status-pill status-active">
+            <i class="fa-solid fa-robot"></i>
+            <span id="botPauseText">Bot Active</span>
+          </div>
+
+          <button id="toggleBotBtn" class="btn btn-warning" title="Pause or Resume bot auto-replies">
+            <i class="fa-solid fa-pause"></i>
+            <span id="toggleBotBtnText">Pause Bot</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Sub-bar: Delivery Coverage Banner -->
+    <div class="coverage-bar">
+      <div class="coverage-content">
+        <i class="fa-solid fa-motorcycle text-amber"></i>
+        <span><strong>Asaba Delivery Zones:</strong> Summit Road • Nnebisi Road • Okpanam Road • Anwai Road / Delsu • Cable Point • Infant Jesus</span>
+      </div>
+      <div class="coverage-clock" id="liveClock">--:--:--</div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <main class="main-content">
+      
+      <!-- Top Overview Stats -->
+      <section class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon icon-amber"><i class="fa-solid fa-receipt"></i></div>
+          <div class="stat-info">
+            <span class="stat-label">Total Orders</span>
+            <span class="stat-value" id="statTotalOrders">0</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon icon-blue"><i class="fa-solid fa-fire-burner"></i></div>
+          <div class="stat-info">
+            <span class="stat-label">Active / Cooking</span>
+            <span class="stat-value" id="statActiveOrders">0</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon icon-green"><i class="fa-solid fa-circle-check"></i></div>
+          <div class="stat-info">
+            <span class="stat-label">Delivered</span>
+            <span class="stat-value" id="statDeliveredOrders">0</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon icon-purple"><i class="fa-solid fa-naira-sign"></i></div>
+          <div class="stat-info">
+            <span class="stat-label">Total Sales</span>
+            <span class="stat-value" id="statTotalSales">₦0</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- WhatsApp Connection & QR Code Section -->
+      <section class="dashboard-section qr-section-card" id="qrSection">
+        <div class="section-header">
+          <div class="section-title-wrap">
+            <i class="fa-brands fa-whatsapp text-green"></i>
+            <h2>WhatsApp Bot Device Link</h2>
+          </div>
+          <span class="refresh-indicator" id="qrRefreshTimer">
+            <i class="fa-solid fa-rotate fa-spin"></i> Auto-checking every 3s
+          </span>
+        </div>
+
+        <div class="qr-content-wrapper">
+          <!-- QR Canvas Box -->
+          <div class="qr-box">
+            <div id="qrLoadingState" class="qr-state-message">
+              <div class="spinner"></div>
+              <p>Initializing WhatsApp Engine...</p>
+              <small>Generating QR Code for linking</small>
+            </div>
+
+            <canvas id="qrCanvas" class="qr-canvas hidden"></canvas>
+
+            <div id="qrConnectedState" class="qr-state-message hidden">
+              <div class="connected-icon">
+                <i class="fa-solid fa-circle-check"></i>
+              </div>
+              <h3>WhatsApp Connected!</h3>
+              <p>Bot is actively receiving & processing food orders for Asaba residents.</p>
+              <div class="connected-phone-badge">
+                <i class="fa-brands fa-whatsapp"></i> Live on WhatsApp
+              </div>
+            </div>
+          </div>
+
+          <!-- Pairing Instructions -->
+          <div class="qr-instructions">
+            <h3><i class="fa-solid fa-link"></i> How to Connect Your WhatsApp</h3>
+            <ol class="step-list">
+              <li>
+                <span class="step-num">1</span>
+                <div>
+                  <strong>Open WhatsApp</strong> on your Android phone or iPhone.
+                </div>
+              </li>
+              <li>
+                <span class="step-num">2</span>
+                <div>
+                  Tap <strong>Menu (3 dots)</strong> on Android or <strong>Settings</strong> on iPhone.
+                </div>
+              </li>
+              <li>
+                <span class="step-num">3</span>
+                <div>
+                  Select <strong>Linked Devices</strong> &gt; tap <strong>Link a Device</strong>.
+                </div>
+              </li>
+              <li>
+                <span class="step-num">4</span>
+                <div>
+                  Point your phone camera to scan the <strong>QR Code</strong> on the left.
+                </div>
+              </li>
+            </ol>
+
+            <div class="owner-tip-box">
+              <i class="fa-solid fa-shield-halved"></i>
+              <div>
+                <strong>Personal Chat Safety:</strong> If you use your personal number for the bot, click the <em>"Pause Bot"</em> button above anytime you want to chat privately without automatic bot replies.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Live Orders Section -->
+      <section class="dashboard-section">
+        <div class="section-header">
+          <div class="section-title-wrap">
+            <i class="fa-solid fa-bell-concierge text-amber"></i>
+            <h2>Live Asaba Customer Orders</h2>
+            <span class="order-counter-badge" id="orderCountBadge">0 Orders</span>
+          </div>
+
+          <!-- Controls & Order Status Filter Pills -->
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <button id="soundToggleBtn" class="filter-pill" title="Toggle audio chime on new orders">
+              <i class="fa-solid fa-volume-high"></i> Sound: ON
+            </button>
+            <button id="simulateOrderBtn" class="filter-pill" style="background: rgba(245, 158, 11, 0.15); color: var(--amber); border-color: rgba(245, 158, 11, 0.3);" title="Simulate a customer order from Asaba">
+              <i class="fa-solid fa-plus"></i> Simulate Order
+            </button>
+            <div class="table-filters" id="orderFilterPills">
+              <button class="filter-pill active" data-filter="all">All</button>
+              <button class="filter-pill" data-filter="New">New</button>
+              <button class="filter-pill" data-filter="Cooking">Cooking</button>
+              <button class="filter-pill" data-filter="Ready">Ready</button>
+              <button class="filter-pill" data-filter="Delivered">Delivered</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table" id="ordersTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Customer Phone</th>
+                <th>Items Ordered</th>
+                <th>Qty</th>
+                <th>Spicy & Notes</th>
+                <th>Delivery Location</th>
+                <th>Total</th>
+                <th>Time</th>
+                <th>Status (Click to notify customer)</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTableBody">
+              <tr>
+                <td colspan="9" class="empty-table-cell">
+                  <div class="empty-state">
+                    <i class="fa-solid fa-receipt"></i>
+                    <p>No orders yet today.</p>
+                    <small>When customers in Asaba WhatsApp the bot with <em>"order 1"</em>, orders will instantly appear here!</small>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Menu Management Section -->
+      <section class="dashboard-section">
+        <div class="section-header">
+          <div class="section-title-wrap">
+            <i class="fa-solid fa-drumstick-bite text-crimson"></i>
+            <h2>Menu Management (20 Asaba Specials)</h2>
+          </div>
+
+          <div class="menu-controls-wrap">
+            <!-- Search Menu -->
+            <div class="search-input-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="menuSearchInput" placeholder="Search menu item...">
+            </div>
+
+            <!-- Category Filter Buttons -->
+            <div class="table-filters" id="menuCategoryPills">
+              <button class="filter-pill active" data-category="all">All</button>
+              <button class="filter-pill" data-category="BBQ">BBQ</button>
+              <button class="filter-pill" data-category="Pepper Soup">Pepper Soup</button>
+              <button class="filter-pill" data-category="Rice">Rice</button>
+              <button class="filter-pill" data-category="Local">Local</button>
+              <button class="filter-pill" data-category="Soup">Soup</button>
+              <button class="filter-pill" data-category="Drink">Drink</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table" id="menuTable">
+            <thead>
+              <tr>
+                <th style="width: 60px;">ID</th>
+                <th>Item Name</th>
+                <th>Category</th>
+                <th>Price (₦)</th>
+                <th>Availability Status</th>
+                <th style="text-align: center;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="menuTableBody">
+              <!-- Dynamically populated via app.js -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div class="footer-container">
+        <div class="footer-main-text">
+          <span class="heart-icon">❤️</span> <strong>Built for Asaba Residents</strong> - Delivery: Summit, Nnebisi, Okpanam, Anwai, Cable Point, Infant Jesus
+        </div>
+        <div class="footer-meta">
+          <span><i class="fa-solid fa-server"></i> Hostable on Render.com</span>
+          <span>•</span>
+          <span><i class="fa-brands fa-node-js"></i> Node 18+ Express</span>
+          <span>•</span>
+          <span><i class="fa-solid fa-brain"></i> Gemini AI Fallback</span>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
