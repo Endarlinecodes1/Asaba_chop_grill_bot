@@ -1,14 +1,32 @@
 FROM node:20-slim
 
-# Install needed libraries for WhatsApp bot
+# Install ALL Chrome dependencies for WhatsApp bot
 RUN apt-get update && apt-get install -y \
-  wget gnupg ca-certificates procps \
-  libxss1 libasound2 libatk1.0-0 libatk-bridge2.0-0 libcairo2 libcups2 \
-  libdbus-1-3 libexpat1 libfontconfig1 libgdk-pixbuf2.0-0 libglib2.0-0 \
-  libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libx11-6 libx11-xcb1 \
-  libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 \
-  libxrandr2 libxrender1 libxss1 libxtst6 \
-  fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf \
+  libnss3 \
+  libnspr4 \
+  libatk1.0-0 \
+  libatk-bridge2.0-0 \
+  libcups2 \
+  libdrm2 \
+  libxkbcommon0 \
+  libxcomposite1 \
+  libxdamage1 \
+  libxfixes3 \
+  libxrandr2 \
+  libgbm1 \
+  libpango-1.0-0 \
+  libcairo2 \
+  libasound2 \
+  libatspi2.0-0 \
+  libxshmfence1 \
+  libx11-6 \
+  libx11-xcb1 \
+  libxcb1 \
+  libxext6 \
+  libxss1 \
+  libxtst6 \
+  fonts-liberation \
+  ca-certificates \
   --no-install-recommends \
   && rm -rf /var/lib/apt/lists/*
 
@@ -18,5 +36,8 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
+
+# Tell puppeteer where to cache
+ENV PUPPETEER_CACHE_DIR=/app/.cache/puppeteer
 
 CMD ["npm", "start"]
