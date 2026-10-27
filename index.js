@@ -49,7 +49,9 @@ const puppeteerArgs = [
   '--disable-accelerated-2d-canvas',
   '--no-first-run',
   '--no-zygote',
-  '--disable-gpu'
+  '--disable-gpu',
+  '--single-process'
+
 ];
 
 const puppeteerConfig = {
@@ -105,7 +107,7 @@ client.on('qr', async (qr) => {
   global.qrCode = qr;
   global.isReady = false;
   console.log('📲 [WhatsApp] QR Code received! Scan it from WhatsApp > Linked Devices:');
-  
+
   // Generate Data URL for direct HTML rendering
   try {
     global.qrDataUrl = await qrcode.toDataURL(qr);
