@@ -1,33 +1,22 @@
-# Production Dockerfile for Render.com (Free Tier)
-# Includes complete Chromium runtime packages required for whatsapp-web.js Puppeteer
-FROM node:18-bullseye-slim
+FROM node:20-slim
 
-# Install latest chrome dev package and fonts to support major charsets
-RUN apt-get update \
-    && apt-get install -y wget gnupg ca-certificates procps libxss1 \
-    && apt-get install -y chromium fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
-      --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/*
+# Install needed libraries for WhatsApp bot
+RUN apt-get update && apt-get install -y \
+  wget gnupg ca-certificates procps \
+  libxss1 libasound2 libatk1.0-0 libatk-bridge2.0-0 libcairo2 libcups2 \
+  libdbus-1-3 libexpat1 libfontconfig1 libgdk-pixbuf2.0-0 libglib2.0-0 \
+  libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libx11-6 libx11-xcb1 \
+  libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 \
+  libxrandr2 libxrender1 libxss1 libxtst6 \
+  fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf \
+  --no-install-recommends \
+  && rm -rf /var/lib/apt/lists/*
 
-# Tell Puppeteer to use the installed Chromium package
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+WORKDIR /app
 
-# Create app directory
-WORKDIR /usr/src/app
-
-# Install app dependencies
 COPY package*.json ./
-RUN npm install --omit=dev
+RUN npm install
 
-# Bundle app source
 COPY . .
 
-# Ensure data directory exists
-RUN mkdir -p data .wwebjs_auth
-
-# Expose server port
-EXPOSE 3000
-
-# Start server
-CMD ["node", "index.js"]
+CMD ["npm", "start"]
