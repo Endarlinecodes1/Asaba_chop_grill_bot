@@ -128,7 +128,11 @@ async function fetchQrStatus() {
     const res = await fetch('/api/qr');
     const data = await res.json();
     console.log('QR API:', data);
-
+    if (data.qrDataUrl) {
+      document.getElementById('qrCode').src = data.qrDataUrl;
+      document.getElementById('qrCode').style.display = 'block';
+      return;
+    }
     const qrImg = document.getElementById('qrCode') || document.getElementById('qrImage') || document.querySelector('.qr-box img') || document.querySelector('#qrContainer img');
     const qrContainer = document.getElementById('qrContainer') || document.getElementById('qrSection') || document.querySelector('.qr-box');
     const statusDot = document.getElementById('statusDot');
