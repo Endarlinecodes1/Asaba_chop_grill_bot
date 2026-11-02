@@ -107,7 +107,7 @@ client.on('qr', async (qr) => {
   console.log('[WhatsApp] QR received, converting to image...');
   try {
     global.qrCode = qr; // raw string
-    global.qrDataUrl = await QRCode.toDataURL(qr); // image for website
+    global.qrDataUrl = await qrcode.toDataURL(qr); // image for website
     global.isReady = false;
     console.log('[WhatsApp] QR DataURL ready for frontend');
   } catch (err) {
