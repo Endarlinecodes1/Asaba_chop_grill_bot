@@ -104,27 +104,18 @@ const client = new Client({
 
 // Event: QR Code Received
 client.on('qr', async (qr) => {
-  global.qrCode = qr;
-  global.isReady = false;
-  console.log('[WhatsApp] QR Code received! Scan it from WhatsApp > Linked Devices');
-
-  // Generate Data URL for direct HTML rendering
+  console.log('[WhatsApp] QR received, converting to image...');
   try {
-    const qrImage = await qrcode.toDataURL(qr);
-    global.qrDataUrl = qrImage;
-    console.log('[QR] Data URL generated for dashboard');
+    global.qrCode = qr; // raw string
+    global.qrDataUrl = await QRCode.toDataURL(qr); // image for website
+    global.isReady = false;
+    console.log('[WhatsApp] QR DataURL ready for frontend');
   } catch (err) {
-    console.error('Error generating QR DataURL:', err.message);
-    global.qrDataUrl = null;
+    console.error('[WhatsApp] Failed to make QR image:', err.message);
   }
-
-  // Print small ascii QR to terminal if possible
-  try {
-    qrcode.toString(qr, { type: 'terminal', small: true }, (err, url) => {
-      if (!err) console.log(url);
-    });
-  } catch { }
 });
+
+
 
 
 
@@ -402,6 +393,23 @@ app.post('/api/orders/simulate', (req, res) => {
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+// API to give QR to frontend
+app.get('/api/qr', (req, res) => {
+  res.json({
+    qr: global.qrCode,
+    qrDataUrl: global.qrDataUrl,
+    ready: Boolean(global.isReady),
+    paused: Boolean(global.botPaused)
+  });
+});
+
+app.get('/api/status', (req, res) => {
+  res.json({
+    ready: Boolean(global.isReady),
+    hasQr: !!global.qrDataUrl
+  });
+});
+
 
 // Start Express HTTP Server
 app.listen(PORT, '0.0.0.0', () => {
