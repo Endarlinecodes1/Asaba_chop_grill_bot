@@ -404,7 +404,7 @@ app.get('/', (req, res) => {
 });
 
 // Start Express HTTP Server
-server.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Asaba Chop & Grill server is running at http://localhost:${PORT}`);
   console.log(`📍 Serving Asaba Residents: Summit, Nnebisi, Okpanam, Anwai, Cable Point & Infant Jesus`);
 });
