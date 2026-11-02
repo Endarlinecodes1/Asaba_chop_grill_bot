@@ -106,20 +106,27 @@ const client = new Client({
 client.on('qr', async (qr) => {
   global.qrCode = qr;
   global.isReady = false;
-  console.log('📲 [WhatsApp] QR Code received! Scan it from WhatsApp > Linked Devices:');
+  console.log('[WhatsApp] QR Code received! Scan it from WhatsApp > Linked Devices');
 
   // Generate Data URL for direct HTML rendering
   try {
-    global.qrDataUrl = await qrcode.toDataURL(qr);
+    const qrImage = await qrcode.toDataURL(qr);
+    global.qrDataUrl = qrImage;
+    console.log('[QR] Data URL generated for dashboard');
   } catch (err) {
     console.error('Error generating QR DataURL:', err.message);
+    global.qrDataUrl = null;
   }
 
   // Print small ascii QR to terminal if possible
-  qrcode.toString(qr, { type: 'terminal', small: true }, (err, url) => {
-    if (!err) console.log(url);
-  });
+  try {
+    qrcode.toString(qr, { type: 'terminal', small: true }, (err, url) => {
+      if (!err) console.log(url);
+    });
+  } catch { }
 });
+
+
 
 // Event: Client Ready
 client.on('ready', () => {
@@ -397,7 +404,7 @@ app.get('/', (req, res) => {
 });
 
 // Start Express HTTP Server
-app.listen(PORT, '0.0.0.0', () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Asaba Chop & Grill server is running at http://localhost:${PORT}`);
   console.log(`📍 Serving Asaba Residents: Summit, Nnebisi, Okpanam, Anwai, Cable Point & Infant Jesus`);
 });
