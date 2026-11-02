@@ -43,7 +43,7 @@ const liveClock = document.getElementById('liveClock');
 document.addEventListener('DOMContentLoaded', () => {
   setupEventListeners();
   startLiveClock();
-  
+
   // Initial data fetches
   fetchQrStatus();
   fetchMenu();
@@ -102,8 +102,8 @@ function setupEventListeners() {
   if (soundBtn) {
     soundBtn.addEventListener('click', () => {
       soundEnabled = !soundEnabled;
-      soundBtn.innerHTML = soundEnabled 
-        ? '<i class="fa-solid fa-volume-high"></i> Sound: ON' 
+      soundBtn.innerHTML = soundEnabled
+        ? '<i class="fa-solid fa-volume-high"></i> Sound: ON'
         : '<i class="fa-solid fa-volume-xmark"></i> Sound: OFF';
       showToast(`Audio alerts turned ${soundEnabled ? 'ON' : 'OFF'}`, 'info');
       if (soundEnabled) playChime();
@@ -123,65 +123,41 @@ function startLiveClock() {
   setInterval(updateTime, 1000);
 }
 
-/**
- * Poll QR code and connection status from /api/qr
- */
 async function fetchQrStatus() {
   try {
     const res = await fetch('/api/qr');
-    if (!res.ok) return;
     const data = await res.json();
+    console.log('QR API:', data);
 
-    isBotReady = Boolean(data.ready);
-    isBotPaused = Boolean(data.paused);
+    const qrImg = document.getElementById('qrCode') || document.getElementById('qrImage') || document.querySelector('.qr-box img') || document.querySelector('#qrContainer img');
+    const qrContainer = document.getElementById('qrContainer') || document.getElementById('qrSection') || document.querySelector('.qr-box');
+    const statusDot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText') || document.getElementById('connectionStatus');
 
-    // Update Bot Pause UI
-    updatePauseUI(isBotPaused);
-
-    // Update WhatsApp Connection UI
-    if (isBotReady) {
-      botConnectionBadge.className = 'status-pill status-connected';
-      botStatusText.textContent = 'WhatsApp Connected';
-      
-      qrLoadingState.classList.add('hidden');
-      qrCanvas.classList.add('hidden');
-      qrConnectedState.classList.remove('hidden');
-      lastQrString = null;
-    } else if (data.qr) {
-      botConnectionBadge.className = 'status-pill status-pending';
-      botStatusText.textContent = 'Scan QR Needed';
-
-      qrLoadingState.classList.add('hidden');
-      qrConnectedState.classList.add('hidden');
-      qrCanvas.classList.remove('hidden');
-
-      // Re-render QR only if changed
-      if (data.qr !== lastQrString) {
-        lastQrString = data.qr;
-        if (window.QRCode) {
-          QRCode.toCanvas(qrCanvas, data.qr, {
-            width: 220,
-            margin: 1,
-            color: { dark: '#000000', light: '#ffffff' }
-          }, (err) => {
-            if (err) console.error('QRCode rendering error:', err);
-          });
-        }
-      }
-    } else {
-      // Waiting for QR or initializing
-      botConnectionBadge.className = 'status-pill status-disconnected';
-      botStatusText.textContent = 'Initializing WhatsApp...';
-      
-      qrCanvas.classList.add('hidden');
-      qrConnectedState.classList.add('hidden');
-      qrLoadingState.classList.remove('hidden');
+    if (data.ready) {
+      if (statusDot) { statusDot.className = 'status-dot connected'; }
+      if (statusText) statusText.textContent = '✅ Asaba Chop & Grill is LIVE';
+      if (qrContainer) qrContainer.style.display = 'none';
+      return;
     }
 
-  } catch (err) {
-    console.warn('QR poll error:', err.message);
+    if (data.qrDataUrl && qrImg) {
+      qrImg.src = data.qrDataUrl;
+      qrImg.style.display = 'block';
+      qrImg.style.width = '250px';
+      qrImg.style.height = '250px';
+      if (qrContainer) qrContainer.style.display = 'block';
+      if (statusText) statusText.textContent = 'Scan QR with WhatsApp - Linked Devices';
+      console.log('QR set to image!');
+    } else {
+      if (statusText) statusText.textContent = 'Waiting for QR... Refreshing in 3s';
+    }
+
+  } catch (e) {
+    console.error('QR fetch failed', e);
   }
 }
+
 
 /**
  * Update UI according to bot pause state
@@ -244,10 +220,10 @@ function renderMenu() {
   }
 
   let filtered = currentMenu.filter(item => {
-    const matchesCategory = currentCategoryFilter === 'all' || 
+    const matchesCategory = currentCategoryFilter === 'all' ||
       item.category.toLowerCase() === currentCategoryFilter.toLowerCase();
-    
-    const matchesSearch = !currentSearchQuery || 
+
+    const matchesSearch = !currentSearchQuery ||
       item.name.toLowerCase().includes(currentSearchQuery) ||
       item.category.toLowerCase().includes(currentSearchQuery) ||
       String(item.id).includes(currentSearchQuery);
@@ -301,7 +277,7 @@ function renderMenu() {
 /**
  * Toggle menu item availability
  */
-window.toggleItemAvailability = async function(itemId) {
+window.toggleItemAvailability = async function (itemId) {
   try {
     const res = await fetch(`/api/menu/toggle/${itemId}`, { method: 'POST' });
     const data = await res.json();
@@ -329,7 +305,7 @@ function playChime() {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     if (!AudioContext) return;
     const ctx = new AudioContext();
-    
+
     // Pleasant dual-tone bell chime
     const playTone = (freq, time, duration) => {
       const osc = ctx.createOscillator();
@@ -377,7 +353,7 @@ async function fetchOrders() {
     const res = await fetch('/api/orders');
     if (!res.ok) return;
     const orders = await res.json();
-    
+
     // Detect new orders and chime
     if (previousOrderCount !== -1 && orders.length > previousOrderCount) {
       playChime();
@@ -449,7 +425,7 @@ function renderOrders() {
   ordersTableBody.innerHTML = filtered.map(order => {
     const cleanPhone = (order.customerPhone || order.phone || '').replace('@c.us', '');
     const timeFormatted = order.time ? new Date(order.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
-    
+
     return `
       <tr>
         <td>
@@ -524,7 +500,7 @@ function renderOrders() {
 /**
  * Print dispatch slip / kitchen ticket
  */
-window.printOrderTicket = function(orderId) {
+window.printOrderTicket = function (orderId) {
   const order = currentOrders.find(o => o.id === orderId);
   if (!order) return;
 
@@ -587,7 +563,7 @@ window.printOrderTicket = function(orderId) {
 /**
  * Update Order Status and send WhatsApp message to customer automatically
  */
-window.updateOrderStatus = async function(orderId, newStatus) {
+window.updateOrderStatus = async function (orderId, newStatus) {
   try {
     const res = await fetch('/api/orders/status', {
       method: 'POST',
@@ -605,10 +581,10 @@ window.updateOrderStatus = async function(orderId, newStatus) {
         updateStats(currentOrders);
       }
 
-      const notifyMsg = data.customerNotified 
-        ? 'Customer automatically notified on WhatsApp!' 
+      const notifyMsg = data.customerNotified
+        ? 'Customer automatically notified on WhatsApp!'
         : '(Bot offline or customer phone missing)';
-      
+
       showToast(`Order #${orderId} marked as ${newStatus}! ${notifyMsg}`, 'success');
     } else {
       showToast(data.error || 'Failed to update order', 'error');
