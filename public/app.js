@@ -129,9 +129,24 @@ async function fetchQrStatus() {
     const data = await res.json();
     console.log('QR API:', data);
     if (data.qrDataUrl) {
-      document.getElementById('qrCode').src = data.qrDataUrl;
-      document.getElementById('qrCode').style.display = 'block';
-      return;
+      const canvas = document.getElementById('qrCanvas');
+      const loading = document.getElementById('qrLoading');
+      const qrSection = document.getElementById('qrSection');
+
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        img.onload = function () {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0);
+          canvas.classList.remove('hidden');
+          canvas.style.display = 'block';
+          if (loading) loading.style.display = 'none';
+        };
+        img.src = data.qrDataUrl;
+      }
     }
     const qrImg = document.getElementById('qrCode') || document.getElementById('qrImage') || document.querySelector('.qr-box img') || document.querySelector('#qrContainer img');
     const qrContainer = document.getElementById('qrContainer') || document.getElementById('qrSection') || document.querySelector('.qr-box');
